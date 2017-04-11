@@ -11,7 +11,7 @@ import (
 func main() {
 	client, _ := xmlrpc.NewClient("https://pypi.python.org/pypi", nil)
 	defer client.Close()
-	var result [10]interface{}
+	var result []interface{}
 	err := client.Call("top_packages", 10, &result)
 	if err != nil {
 		log.Fatal(err)
