@@ -28,7 +28,7 @@ func main() {
 		URL       string `xmlrps:"url"`
 	}
 	for _, p := range packages {
-		pkg := p.(pkgInfo)
+		pkg := p.(pkgInfo)  // panic: interface conversion: interface {} is []interface {}, not main.pkgInfo
 		println(pkg.Filename)
 	}
 }
