@@ -25,13 +25,13 @@ func main() {
 	}
 	fmt.Println(len(packages), packages) // 10 (correct)
 	for _, p := range packages {
-		fmt.Println(reflect.TypeOf(p), p)  // []interface {} [six 110953835]
+		fmt.Println(reflect.TypeOf(p), p) // []interface {} [six 110953835]
 		// How do I get just the p.pkgName ("six" as a string)?
 		// How do I get just the p.downloads (110953835 as an int)?
-	    type pkgInfo struct {
-	        pkgName   string
+		type pkgInfo struct {
+			pkgName   string
 			downloads int
 		}
-		fmt.Println(p.(pkgInfo))  // panic: interface conversion: interface {} is []interface {}, not main.pkgInfo
+		fmt.Println(p.(pkgInfo)) // panic: interface conversion: interface {} is []interface {}, not main.pkgInfo
 	}
 }
