@@ -1,3 +1,9 @@
+///usr/bin/env go run "$0" "$@"; exit "$?"
+// the line above is a shebang-like line for go
+// chmod +x os_exit_seven.go
+// ./os_exit_seven.go
+// echo "$?"  # unfortunately it is 1 instead of 7 but at least it is not zero!
+
 package main
 
 import (
@@ -11,13 +17,16 @@ import (
 func main() {
 	client, _ := xmlrpc.NewClient("https://pypi.python.org/pypi", nil)
 	defer client.Close()
-	var result []interface{}
-	err := client.Call("top_packages", 10, &result)
-	if err != nil {
+	var packages []interface{}
+	if err := client.Call("top_packages", 10, &packages); err != nil {
 		log.Fatal(err)
 	}
-	// print(result[0].(string))
-	for i, r := range result {
-		println(i, r)
+	println(len(packages)) // 10 (correct)
+	type pkgInfo struct {
+		Downloads int    `xmlrpc:"downloads"`
+		Filename  string `xmlrpc:"filename"`
+		URL       string `xmlrps:"url"`
 	}
+	pkg := packages[0].(pkgInfo) // panic: interface conversion: interface {} is []interface {}, not main.pkgInfo
+	println(pkg.Filename)
 }
