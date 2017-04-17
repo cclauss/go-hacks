@@ -5,15 +5,11 @@ package main
 import "fmt"
 
 func makeChessPieces() map[string]string {
-	var names []string
-	for _, color := range "WB" {
-		for _, name := range "KQRBNP" {
-			names = append(names, string(color)+string(name))
-		}
-	}
 	pieces := make(map[string]string)
-	for i, name := range names {
-		pieces[name] = string('\u2654' + i)
+	for c, color := range "WB" {
+		for n, name := range "KQRBNP" {
+			pieces[string(color)+string(name)] = string('\u2654' + c*6 + n)
+		}
 	}
 	return pieces
 }
