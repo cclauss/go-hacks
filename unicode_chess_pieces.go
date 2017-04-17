@@ -22,4 +22,5 @@ func main() {
 	fmt.Printf("%v\n", makeChessPieces())
 }
 
-// map[WK:♔ WN:♘ WP:♙ BQ:♛ BR:♜ BN:♞ WQ:♕ WR:♖ WB:♗ BK:♚ BB:♝ BP:♟]
+// map[BB:♝, BK:♚, BN:♞, BP:♟, BQ:♛, BR:♜,
+//     WB:♗, WK:♔, WN:♘, WP:♙, WQ:♕, WR:♖]
