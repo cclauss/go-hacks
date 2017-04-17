@@ -1,18 +1,25 @@
-///usr/bin/env go run "$0" "$@"; exit "$?"
+///usr/bin/env go run ${0} ${@}; exit ${?}
 
 package main
 
 import "fmt"
 
-func main() {
-	white_pieces := [6]rune{}
-	black_pieces := [6]rune{}
-	for i := range white_pieces {
-		white_pieces[i] = rune('\u2654' + i)
-		black_pieces[i] = rune('\u265A' + i)
+func makeChessPieces() map[string]string {
+	var names []string
+	for _, color := range "WB" {
+		for _, name := range "KQRBNP" {
+			names = append(names, string(color)+string(name))
+		}
 	}
-	fmt.Printf("%c\n%c\n", white_pieces, black_pieces)
+	pieces := make(map[string]string)
+	for i, name := range names {
+		pieces[name] = string('\u2654' + i)
+	}
+	return pieces
 }
 
-// [♔ ♕ ♖ ♗ ♘ ♙]
-// [♚ ♛ ♜ ♝ ♞ ♟]
+func main() {
+	fmt.Printf("%v\n", makeChessPieces())
+}
+
+// map[WK:♔ WN:♘ WP:♙ BQ:♛ BR:♜ BN:♞ WQ:♕ WR:♖ WB:♗ BK:♚ BB:♝ BP:♟]
