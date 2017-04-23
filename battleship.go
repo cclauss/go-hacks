@@ -4,15 +4,15 @@ package main
 +------------------------------------------------------------------------+
 |     A  B  C  D  E  F  G  H  I  J  ||  A  B  C  D  E  F  G  H  I  J     |
 |  1                                 1                                 1 |
-|  2                                 2                                 2 |
+|  2        A  A  A  A  A            2                                 2 |
 |  3                                 3                                 3 |
-|  4                                 4                                 4 |
+|  4           B  B  B  B            4                                 4 |
 |  5                                 5                                 5 |
-|  6                                 6                                 6 |
+|  6  C  C  C                        6                                 6 |
 |  7                                 7                                 7 |
-|  8                                 8                                 8 |
+|  8                       S  S  S   8                                 8 |
 |  9                                 9                                 9 |
-| 10                                10                                10 |
+| 10              D  D              10                                10 |
 |     A  B  C  D  E  F  G  H  I  J  ||  A  B  C  D  E  F  G  H  I  J     |
 +------------------------------------------------------------------------+
 */
@@ -93,13 +93,6 @@ func clokeInStr(str string) []string {
 }
 
 func letterRow() string {
-	/*
-		    letters := []string{}
-			for _, c := range "ABCDEFGHIJ" {
-				letters = append(letters, string(c))
-			}
-			temp := s.Join(letters, "  ")
-	*/
 	letters := strings.Join(charsInStr(letters), "  ")
 	return fmt.Sprintf("|     %s  ||  %s     |", letters, letters)
 }
