@@ -183,7 +183,7 @@ func askUser(prompt string) (string, error) {
 
 func askWhichSquare() string {
 	text, _ := askUser("Enter a square between A1 and J10:")
-	pt, _ := letterNumberToPoint(text)
+	// pt, _ := letterNumberToPoint(text)
 	// fmt.Printf("(%T) %s ==> %v|\n", text, text, pt)
 	return text
 }
