@@ -1,3 +1,8 @@
+///usr/bin/env go run ${0} ${@} ; exit ${?}
+// the line above is a shebang-like line for golang
+// chmod +x battleship.go
+// ./battleship.go
+
 package main
 
 /*
@@ -59,6 +64,19 @@ func randomBool() bool { return rand.Intn(2) == 1 }
 
 func randomPoint() point { return point{rand.Intn(10), rand.Intn(10)} }
 
+func neighbors(pt point) (pts []point) {
+	u := point{pt.X - 1, pt.Y}
+	d := point{pt.X + 1, pt.Y}
+	l := point{pt.X, pt.Y - 1}
+	r := point{pt.X, pt.Y + 1}
+	for _, pt = range []point{u, d, l, r} {
+		if invalidPoint(pt) == false {
+			pts = append(pts, pt)
+		}
+	}
+	return
+}
+
 func strReplaceRune(s string, pos int, r rune) string {
 	// replace the rune at index pos with rune r
 	return strings.Join([]string{s[:pos], s[pos+1:]}, string(r))
@@ -81,9 +99,9 @@ func pointsForShip(topLeft point, length int, across bool) (pts []point) {
 
 func pointToLetterNumber(pt point) (string, error) {
 	if invalidPoint(pt) {
-		return "", errors.New(fmt.Sprintf("invalid point %v.", pt))
+		return "", fmt.Errorf("invalid point %v", pt)
 	}
-	return fmt.Sprintf("%s%d", letters[pt.X], pt.Y+1), nil
+	return fmt.Sprintf("%c%d", letters[pt.X], pt.Y+1), nil
 }
 
 func letterNumberToPoint(s string) (pt point, err error) {
@@ -130,7 +148,7 @@ func clokeInStr(str string) []string {
 }
 
 func formatRow(i int) string {
-	return fmt.Sprintf("| %2d  %s  %#2[1]d  %s  %#2[1]d |", i, "%s")
+	return fmt.Sprintf("| %2d  %s  %2[1]d  %s  %2[1]d |", i, "%s")
 }
 
 func board(homeTeam, awayTeam player) string {
@@ -300,10 +318,7 @@ func main() {
 	fmt.Println(board(humanPlayer, compuPlayer))
 	gameOn := hasAnyShips(humanPlayer) && hasAnyShips(compuPlayer)
 	for gameOn {
-		gameOn = humanTurn(compuPlayer)
-		if gameOn {
-			gameOn = compuTurn(humanPlayer)
-		}
+		gameOn = humanTurn(compuPlayer) && compuTurn(humanPlayer)
 		fmt.Println(board(humanPlayer, compuPlayer))
 	}
 }
