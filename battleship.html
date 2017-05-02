@@ -6,10 +6,13 @@
 
 <h1>Battleship</h1>
 
-<form action="/save/{{.Title}}" method="POST">
+<!-- <form action="/save/{{.Title}}" method="POST"> -->
+<!-- <form> -->
+<!-- <form onSubmit="window.location.reload()"> -->
+<form onSubmit="setTimeout(function(){location = ''}, 20)">
     <table>
         <tr>
-            <th colspan="10">Home Team: {{.HomeStatus}}</th>
+            <th colspan="10">Offence: Drop bomb here!</th>
         </tr>
         <!--
         <tr>
@@ -154,7 +157,7 @@
 
 <table>
     <tr>
-        <th colspan="10">Away Team: {{.AwayStatus}}</th>
+        <th colspan="10">Defence: Splashes are good but explosions, not so much...</th>
     </tr>
     <!--
     <tr>
@@ -291,3 +294,5 @@
         <td>{{.A99}}</td>
     </tr>
 </table>
+
+<h1>map[ROWBOAT:🚣 SPEEDBOAT:🚤 PASSENGER SHIP:🛳 CANOE:🛶 SHIP:🚢]</h1>
