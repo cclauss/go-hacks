@@ -64,6 +64,34 @@ func randomBool() bool { return rand.Intn(2) == 1 }
 
 func randomPoint() point { return point{rand.Intn(10), rand.Intn(10)} }
 
+func htmlSubmitButton(x, y int) string {
+	return fmt.Sprintf("<button type='submit' name='%d,%d'>&nbsp;</button>", x, y)
+}
+
+func template_map(homeTeam, awayTeam player) map[string]string {
+	m := map[string]string{
+		"HomeStatus": homeTeam.name,
+		"AwayStatus": awayTeam.name,
+	}
+	teamBoards := map[string]([]string){
+		"H": homeTeam.board,
+		"A": awayTeam.board,
+	}
+	for letter, board := range teamBoards {
+		for y, row := range board {
+			for x, c := range row {
+				s := string(c)
+				if letter == "A" && strings.ContainsRune(hitAndMiss, c) == false {
+					// convert  locs where human can drop bombs into html buttons
+					s = htmlSubmitButton(x, y)
+				}
+				m[fmt.Sprintf("%s%d%d", letter, x, y)] = s
+			}
+		}
+	}
+	return m
+}
+
 func neighbors(pt point) (pts []point) {
 	u := point{pt.X - 1, pt.Y}
 	d := point{pt.X + 1, pt.Y}
@@ -307,9 +335,12 @@ func compuPlaceShip(p player, shipName string) {
 }
 
 func main() {
+	// fmt.Println(htmlSubmitButton(point{1, 2}))
 	rand.Seed(time.Now().UnixNano())
 	humanPlayer := makePlayer("human")
 	compuPlayer := makePlayer("computer")
+	fmt.Println(template_map(humanPlayer, compuPlayer))
+	panic("Dude.")
 	for shipName := range ships {
 		fmt.Println(board(humanPlayer, compuPlayer))
 		humanPlaceShip(humanPlayer, shipName)
