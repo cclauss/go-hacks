@@ -27,9 +27,15 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"log"
 	"math/rand"
+	"net/http"
 	"os"
+	"os/exec"
+	"runtime"
+	"strconv"
 	"strings"
+	"text/template"
 	"time"
 )
 
@@ -56,6 +62,8 @@ type player struct {
 	board []string
 }
 
+var players = []player{makePlayer("human"), makePlayer("computer")}
+
 func invalidPoint(pt point) bool {
 	return pt.X < 0 || pt.X > 9 || pt.Y < 0 || pt.Y > 9
 }
@@ -65,7 +73,8 @@ func randomBool() bool { return rand.Intn(2) == 1 }
 func randomPoint() point { return point{rand.Intn(10), rand.Intn(10)} }
 
 func htmlSubmitButton(x, y int) string {
-	return fmt.Sprintf("<button type='submit' name='%d,%d'>&nbsp;</button>", x, y)
+	// return HTMLData(fmt.Sprintf("\"<button type='submit' name='%d,%d'>&nbsp;</button>\"", x, y))
+	return fmt.Sprintf("<button type='submit' name='xy' value='%d,%d'>%[1]d,%d</button>", x, y)
 }
 
 func template_map(homeTeam, awayTeam player) map[string]string {
@@ -81,8 +90,8 @@ func template_map(homeTeam, awayTeam player) map[string]string {
 		for y, row := range board {
 			for x, c := range row {
 				s := string(c)
-				if letter == "A" && strings.ContainsRune(hitAndMiss, c) == false {
-					// convert  locs where human can drop bombs into html buttons
+				if letter == "H" && strings.ContainsRune(hitAndMiss, c) == false {
+					// convert locs where human can drop bombs into html buttons
 					s = htmlSubmitButton(x, y)
 				}
 				m[fmt.Sprintf("%s%d%d", letter, x, y)] = s
@@ -334,22 +343,92 @@ func compuPlaceShip(p player, shipName string) {
 	}
 }
 
+var templates = template.Must(template.ParseFiles("battleship.html"))
+
+/*
+func renderTemplate(w http.ResponseWriter, homeTeam, awayTeam player) {
+	m := template_map(homeTeam, awayTeam)
+	if err := templates.ExecuteTemplate(w, "battleship.html", m); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		m := validPath.FindStringSubmatch(r.URL.Path)
+		if m == nil {
+			http.NotFound(w, r)
+			return
+		}
+		fn(w, r, m[2])
+	}
+}
+*/
+
+type helloHandler struct{}
+
+func (h helloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// fmt.Fprintf(w, "hello, you've hit %s\n", r.URL.Path)
+	/*
+		   }
+
+		   func battleshipHandler(w http.ResponseWriter, req *http.Request) {
+		*-/
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8") // normal header
+		w.WriteHeader(http.StatusOK)
+
+		io.WriteString(w, "Let's play battleship\n")
+	*/
+	// templates := template.Must(template.ParseFiles("battleship.html"))
+	// templates := template.ParseFiles("battleship.html")
+	m := template_map(players[0], players[1])
+	if err := templates.ExecuteTemplate(w, "battleship.html", m); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	buttonPressed := r.FormValue("xy")
+	fmt.Println(buttonPressed)
+	if buttonPressed != "" {
+		x, _ := strconv.Atoi(buttonPressed[:1])
+		y, _ := strconv.Atoi(buttonPressed[2:])
+		dropABomb(players[0], point{x, y})
+		browserReload()
+	} else {
+		fmt.Println(buttonPressed)
+	}
+	// r.ParseForm()
+	// fmt.Println(r.Form)
+}
+
+func browserReload() {
+	if runtime.GOOS == "darwin" {
+		exec.Command("open", "http://localhost:8083").Start()
+	}
+}
+
 func main() {
 	// fmt.Println(htmlSubmitButton(point{1, 2}))
 	rand.Seed(time.Now().UnixNano())
-	humanPlayer := makePlayer("human")
-	compuPlayer := makePlayer("computer")
-	fmt.Println(template_map(humanPlayer, compuPlayer))
-	panic("Dude.")
+	humanPlayer := players[0] // makePlayer("human")
+	compuPlayer := players[1] // makePlayer("computer")
+	// fmt.Println(template_map(humanPlayer, compuPlayer))
+	// panic("Dude.")
 	for shipName := range ships {
-		fmt.Println(board(humanPlayer, compuPlayer))
-		humanPlaceShip(humanPlayer, shipName)
+		// fmt.Println(board(humanPlayer, compuPlayer))
+		// humanPlaceShip(humanPlayer, shipName)
+		compuPlaceShip(humanPlayer, shipName)
 		compuPlaceShip(compuPlayer, shipName)
 	}
 	fmt.Println(board(humanPlayer, compuPlayer))
-	gameOn := hasAnyShips(humanPlayer) && hasAnyShips(compuPlayer)
-	for gameOn {
-		gameOn = humanTurn(compuPlayer) && compuTurn(humanPlayer)
-		fmt.Println(board(humanPlayer, compuPlayer))
-	}
+	// gameOn := hasAnyShips(humanPlayer) && hasAnyShips(compuPlayer)
+	fmt.Println("Point your browser to: http://localhost:8080")
+	// http.Handle("/", battleshipHandler)
+	//log.Fatal(http.ListenAndServe(":8080", nil))
+	browserReload()
+	log.Fatal(http.ListenAndServe(":8083", helloHandler{}))
+	/*
+		for gameOn {
+			gameOn = humanTurn(compuPlayer) && compuTurn(humanPlayer)
+			fmt.Println(board(humanPlayer, compuPlayer))
+		}
+	*/
 }
